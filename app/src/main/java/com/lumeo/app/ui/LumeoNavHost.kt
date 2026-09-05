@@ -1,11 +1,15 @@
 package com.lumeo.app.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -78,8 +82,8 @@ private fun NavIcon(dest: Dest) {
 // "Me" tab combines Buddy + Settings behind a simple top-level toggle for Phase 1.
 @Composable
 private fun MeTabScreen() {
-    var showSettings by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    androidx.compose.foundation.layout.Column {
+    var showSettings by remember { mutableStateOf(false) }
+    Column {
         TabRow(selectedTabIndex = if (showSettings) 1 else 0) {
             Tab(selected = !showSettings, onClick = { showSettings = false }, text = { Text("Buddy") })
             Tab(selected = showSettings, onClick = { showSettings = true }, text = { Text("Settings") })
