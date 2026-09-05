@@ -100,14 +100,12 @@ fun LumeoNavHost(
                 TodayScreen(
                     activity = activity,
                     prefs = prefs,
-                    usage = usage,
-                    refresh = refresh
-                )
-            }
-
-            composable(Dest.Deep.route) {
-                DeepTimeScreen(
-
+                composable(Dest.Deep.route) {
+                    DeepTimeScreen(
+                        prefs = prefs,
+                        onChanged = { refresh++ }
+                    )
+                }
 
                 DeepTimeScreen(
                     prefs = prefs,
