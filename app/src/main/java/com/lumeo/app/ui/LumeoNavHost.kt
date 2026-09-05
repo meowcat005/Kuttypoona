@@ -1,93 +1,35 @@
 package com.lumeo.app.ui
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
+import com.lumeo.app.data.AppPreferences
+import com.lumeo.app.data.UsageRepository
 import com.lumeo.app.ui.screens.*
 
-private sealed class Dest(val route: String, val label: String) {
-    object Today : Dest("today", "Today")
-    object DeepTime : Dest("deep_time", "Deep Time")
-    object Insights : Dest("insights", "Insights")
-    object Me : Dest("me", "Me")
-}
+private sealed class Dest(val route: String, val label: String) { data object Today:Dest("today","Today"); data object Deep:Dest("deep","Deep Time"); data object Insights:Dest("insights","Insights"); data object Me:Dest("me","Me") }
+private val dests=listOf(Dest.Today,Dest.Deep,Dest.Insights,Dest.Me)
 
-private val destinations = listOf(Dest.Today, Dest.DeepTime, Dest.Insights, Dest.Me)
-
-@Composable
-fun LumeoNavHost() {
-    val navController = rememberNavController()
-
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                val backStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = backStackEntry?.destination
-
-                destinations.forEach { dest ->
-                    val selected = currentDestination?.hierarchy?.any { it.route == dest.route } == true
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = {
-                            navController.navigate(dest.route) {
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { NavIcon(dest) },
-                        label = { Text(dest.label) }
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Dest.Today.route,
-            modifier = androidx.compose.ui.Modifier.padding(innerPadding)
-        ) {
-            composable(Dest.Today.route) { TodayScreen() }
-            composable(Dest.DeepTime.route) { DeepTimeScreen() }
-            composable(Dest.Insights.route) { InsightsScreen() }
-            composable(Dest.Me.route) { MeTabScreen() }
+@Composable fun LumeoNavHost(activity: Activity, prefs: AppPreferences, usage: UsageRepository, onDarkModeChanged: (Boolean) -> Unit) {
+    val nav=rememberNavController()
+    var refresh by remember { mutableIntStateOf(0) }
+    Scaffold(bottomBar={ NavigationBar { val entry by nav.currentBackStackEntryAsState(); val cur=entry?.destination; dests.forEach { d ->
+        NavigationBarItem(selected=cur?.hierarchy?.any{it.route==d.route}==true,onClick={nav.navigate(d.route){popUpTo(nav.graph.findStartDestination().id){saveState=true};launchSingleTop=true;restoreState=true}},icon={Icon(when(d){Dest.Today->Icons.Filled.Home;Dest.Deep->Icons.Filled.Timer;Dest.Insights->Icons.Filled.BarChart;Dest.Me->Icons.Filled.Person},d.label)},label={Text(d.label)})
+    } } }) { pad ->
+        NavHost(nav,startDestination=Dest.Today.route,modifier=Modifier.padding(pad)) {
+            composable("today"){ TodayScreen(activity,prefs,usage,refresh) }
+            composable("deep"){ DeepTimeScreen(prefs){ refresh++ } }
+            composable("insights"){ InsightsScreen(usage,refresh) }
+            composable("me"){ MeScreen(activity,prefs,usage,onDarkModeChanged){ refresh++ } }
         }
     }
 }
-
-@Composable
-private fun NavIcon(dest: Dest) {
-    val icon = when (dest) {
-        Dest.Today -> Icons.Filled.Home
-        Dest.DeepTime -> Icons.Filled.Timer
-        Dest.Insights -> Icons.Filled.BarChart
-        Dest.Me -> Icons.Filled.Person
-    }
-    Icon(icon, contentDescription = dest.label)
-}
-
-// "Me" tab combines Buddy + Settings behind a simple top-level toggle for Phase 1.
-@Composable
-private fun MeTabScreen() {
-    var showSettings by remember { mutableStateOf(false) }
-    Column {
-        TabRow(selectedTabIndex = if (showSettings) 1 else 0) {
-            Tab(selected = !showSettings, onClick = { showSettings = false }, text = { Text("Buddy") })
-            Tab(selected = showSettings, onClick = { showSettings = true }, text = { Text("Settings") })
-        }
-        if (showSettings) SettingsScreen() else BuddyScreen()
-    }
-}
+@Composable private fun MeScreen(activity: Activity,prefs: AppPreferences,usage: UsageRepository,onDarkModeChanged:(Boolean)->Unit,onChanged:()->Unit){ var settings by remember{mutableStateOf(false)}; Column{ TabRow(selectedTabIndex=if(settings)1 else 0){Tab(!settings,{settings=false},{Text("Buddy")});Tab(settings,{settings=true},{Text("Settings")})}; if(settings) SettingsScreen(activity,prefs,usage,onDarkModeChanged,onChanged) else BuddyScreen(prefs) } }

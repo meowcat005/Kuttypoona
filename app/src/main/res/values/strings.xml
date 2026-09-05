@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Kuttypoona</string>
+    <string name="usage_access_label">Usage access</string>
+    <string name="overlay_access_label">Companion overlay</string>
 </resources>
