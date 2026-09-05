@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Lumeo palette: warm, calm, nature-inspired -->
+    <color name="cream">#FDF8F0</color>
+    <color name="forest_green">#2F4438</color>
+    <color name="sage_green">#8FA98B</color>
+    <color name="peach">#F4C9A8</color>
+    <color name="warm_yellow">#F2C94C</color>
+    <color name="muted_brown">#6B5B4E</color>
+    <color name="dark_green_text">#1E2E24</color>
+</resources>
