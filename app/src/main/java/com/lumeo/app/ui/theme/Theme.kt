@@ -8,4 +8,4 @@ val Cream=Color(0xFFFDF8F0);val ForestGreen=Color(0xFF2F4438);val SageGreen=Colo
 private val Light=lightColorScheme(primary=ForestGreen,onPrimary=Cream,secondary=SageGreen,tertiary=Peach,background=Cream,surface=Cream,onBackground=DarkGreenText,onSurface=DarkGreenText)
 private val Dark=darkColorScheme(primary=SageGreen,secondary=Peach,background=Color(0xFF172019),surface=Color(0xFF1E2A22),onBackground=Cream,onSurface=Cream)
 val LumeoTypography=Typography(headlineMedium=TextStyle(fontSize=28.sp),titleLarge=TextStyle(fontSize=20.sp),bodyLarge=TextStyle(fontSize=16.sp),bodyMedium=TextStyle(fontSize=14.sp))
-@Composable fun LumeoTheme(darkMode:Boolean=false,content:@Composable()->Unit){MaterialTheme(colorScheme=if(darkMode)Dark else Light,typography=LumeoTypography,content=content)}
+@Composable fun LumeoTheme(darkMode:Boolean=false,content: @Composable () -> Unit){MaterialTheme(colorScheme=if(darkMode)Dark else Light,typography=LumeoTypography,content=content)}
